@@ -1,0 +1,13 @@
+// These settings will update along with git. In order to change them locally
+// without committing those changes, you need to tell git to begin ignoring them.
+//
+// to stop using defaults: git update-index --skip-worktree .vscode/settings.json
+// go back to using defaults: git update-index --no-skip-worktree .vscode/settings.json
+{
+    "go.coverOnSave": true,
+    "go.formatTool": "goimports",
+    "go.lintTool": "golangci-lint",
+    "go.testEnvVars": {
+      "APP_ENV": "test"
+    }
+  }

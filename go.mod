@@ -1,3 +1,3 @@
-module advent-of-code-2015
+module advent-of-code
 
 go 1.17

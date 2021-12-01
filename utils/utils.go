@@ -3,6 +3,7 @@ package utils
 import (
 	"bufio"
 	"os"
+	"strconv"
 )
 
 func MinFromSlice(slice []int) int {
@@ -68,4 +69,44 @@ func Permutation(values []string) (result [][]string) {
 		}
 	}
 	return
+}
+
+func Cons(values []string, num int) [][]string {
+	result := make([][]string, 0)
+	for i := 0; i < len(values); i++ {
+		if i+num <= len(values) {
+			result = append(result, values[i:i+num])
+		}
+	}
+	return result
+}
+
+func IntSlice(values []string) []int {
+	result := make([]int, 0, len(values))
+	for _, value := range values {
+		v, err := strconv.Atoi(value)
+		if err != nil {
+			panic(err)
+		}
+		result = append(result, v)
+	}
+	return result
+}
+
+func IntCons(values []string, num int) [][]int {
+	result := make([][]int, 0)
+	for i := 0; i < len(values); i++ {
+		if i+num <= len(values) {
+			result = append(result, IntSlice(values[i:i+num]))
+		}
+	}
+	return result
+}
+
+func Sum(values []int) int {
+	result := 0
+	for _, value := range values {
+		result += value
+	}
+	return result
 }

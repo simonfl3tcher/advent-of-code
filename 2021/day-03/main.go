@@ -101,25 +101,23 @@ func generatorRating(r *reporter, index int, candidates charCandidates, rt Ratin
 	}
 
 	newCandidates := charCandidates{}
-	if len(candidates) > 1 {
-		for ind, k := range candidates {
-			if index > len(k)-1 {
-				break
-			}
-
-			if r[index].equal() {
-				if rt == oxygen {
-					charToCheck = "1"
-				} else {
-					charToCheck = "0"
-				}
-			}
-
-			if string(k[index]) == charToCheck {
-				newCandidates = append(newCandidates, candidates[ind])
-			}
+	for ind, k := range candidates {
+		if index > len(k)-1 {
+			break
 		}
+
+		if r[index].equal() && rt == oxygen {
+			charToCheck = "1"
+		} else if r[index].equal() && rt == co2 {
+			charToCheck = "0"
+		}
+
+		if string(k[index]) != charToCheck {
+			continue
+		}
+		newCandidates = append(newCandidates, candidates[ind])
 	}
+
 	reporter := reporter{}
 	for _, l := range newCandidates {
 		reporter.calulateMostCommonPositions(l)

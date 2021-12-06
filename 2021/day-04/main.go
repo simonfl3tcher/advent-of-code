@@ -9,7 +9,10 @@ import (
 	"strings"
 )
 
-type Card [5][]string
+type Card struct {
+	values [5][]string
+	winner bool
+}
 
 const moveRegex = `\s?([0-9]*)\s+([0-9]*)\s+([0-9]*)\s+([0-9]*)\s+([0-9]*)`
 
@@ -20,10 +23,10 @@ func init() {
 }
 
 func (c *Card) checkCall(str string) {
-	for lineIndex, line := range c {
+	for lineIndex, line := range c.values {
 		for charIndex, char := range line {
 			if char == str {
-				c[lineIndex][charIndex] = "X"
+				c.values[lineIndex][charIndex] = "X"
 			}
 		}
 	}
@@ -32,7 +35,7 @@ func (c *Card) checkCall(str string) {
 func (c *Card) bingo() bool {
 	bingo := false
 	columns := [5][5]string{}
-	for lineIndex, line := range c {
+	for lineIndex, line := range c.values {
 		if reflect.DeepEqual(line, []string{"X", "X", "X", "X", "X"}) {
 			bingo = true
 			break
@@ -60,7 +63,7 @@ func (c *Card) bingo() bool {
 
 func (c *Card) calculateScore(winningNumber string) int {
 	var nums int
-	for _, line := range c {
+	for _, line := range c.values {
 		for _, char := range line {
 			if char != "X" {
 				v, _ := strconv.Atoi(char)
@@ -72,44 +75,69 @@ func (c *Card) calculateScore(winningNumber string) int {
 	return nums * wn
 }
 
-func part1(cards [][]string, calls []string) int {
-	boardCards := []*Card{}
-	for _, card := range cards {
-		ca := Card{}
-		for index, line := range card {
-			matches := regx.FindStringSubmatch(line)
-			ca[index] = []string{matches[1], matches[2], matches[3], matches[4], matches[5]}
-		}
-		boardCards = append(boardCards, &ca)
-	}
+type Winner struct {
+	card          *Card
+	winningNumber string
+}
 
-	var winningCard *Card
-	var winningNumber string
+func part1(i *Input) int {
+	var winner Winner
+
 out:
-	for _, call := range calls {
-		for _, bc := range boardCards {
+	for _, call := range i.calls {
+		for _, bc := range i.boards {
 			bc.checkCall(call)
 		}
-		for _, bc := range boardCards {
+		for _, bc := range i.boards {
 			if bc.bingo() {
 				fmt.Println("in here")
-
-				winningCard = bc
-				winningNumber = call
+				winner.card = bc
+				winner.winningNumber = call
 				break out
 			}
 		}
 	}
 
-	return winningCard.calculateScore(winningNumber)
+	return winner.card.calculateScore(winner.winningNumber)
 }
 
-func part2(cards [][]string, calls []string) int {
-	return 1
+func part2(i *Input) int {
+	var winners []Winner
+
+	for _, call := range i.calls {
+		for _, bc := range i.boards {
+			if !bc.winner {
+				bc.checkCall(call)
+			}
+		}
+		for _, bc := range i.boards {
+			if !bc.winner {
+				if bc.bingo() {
+					bc.winner = true
+					winners = append(winners, Winner{card: bc, winningNumber: call})
+				}
+			}
+		}
+	}
+
+	lastWinner := winners[len(winners)-1]
+	return lastWinner.card.calculateScore(lastWinner.winningNumber)
 }
 
 func main() {
 	lines := utils.FileLinesToSlice("input.txt")
+	input := getInput(lines)
+
+	fmt.Printf("Part 1: %d\n", part1(input))
+	fmt.Printf("Part 2: %d\n", part2(input))
+}
+
+type Input struct {
+	calls  []string
+	boards []*Card
+}
+
+func getInput(lines []string) *Input {
 	calls := strings.Split(lines[0], ",")
 	f := lines[1:]
 	cards := [][]string{}
@@ -121,7 +149,18 @@ func main() {
 		cards = append(cards, f[i+1:i+6])
 		i += 6
 	}
+	return &Input{calls: calls, boards: getBoards(cards)}
+}
 
-	fmt.Printf("Part 1: %d\n", part1(cards, calls))
-	fmt.Printf("Part 2: %d\n", part2(cards, calls))
+func getBoards(cards [][]string) []*Card {
+	boardCards := []*Card{}
+	for _, card := range cards {
+		ca := Card{}
+		for index, line := range card {
+			matches := regx.FindStringSubmatch(line)
+			ca.values[index] = []string{matches[1], matches[2], matches[3], matches[4], matches[5]}
+		}
+		boardCards = append(boardCards, &ca)
+	}
+	return boardCards
 }

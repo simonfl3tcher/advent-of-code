@@ -100,7 +100,6 @@ func runFolds(grid *[][]string, folds []Fold) {
 				}
 				iteration++
 			}
-
 			*grid = (*grid)[:fold.number]
 		}
 	}

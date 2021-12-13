@@ -16,12 +16,6 @@ func init() {
 	foldRegex = regexp.MustCompile(foldRegxExp)
 }
 
-type GridElement struct {
-	value string
-	x     int
-	y     int
-}
-
 type Fold struct {
 	axis   string
 	number int
@@ -30,7 +24,7 @@ type Fold struct {
 func GridAndFoldsFromLines(lines []string) ([][]string, []Fold) {
 	parseFolds := false
 	folds := []Fold{}
-	gridElements := []GridElement{}
+	gridElements := [][2]int{}
 	highestX := 0
 	highestY := 0
 	for _, line := range lines {
@@ -43,8 +37,7 @@ func GridAndFoldsFromLines(lines []string) ([][]string, []Fold) {
 			splits := strings.Split(line, ",")
 			x, _ := strconv.Atoi(splits[0])
 			y, _ := strconv.Atoi(splits[1])
-			ge := GridElement{x: x, y: y, value: "#"}
-			gridElements = append(gridElements, ge)
+			gridElements = append(gridElements, [2]int{x, y})
 			if x > highestX {
 				highestX = x
 			}
@@ -71,7 +64,7 @@ func GridAndFoldsFromLines(lines []string) ([][]string, []Fold) {
 	}
 
 	for _, ge := range gridElements {
-		grid[ge.y][ge.x] = "#"
+		grid[ge[1]][ge[0]] = "#"
 	}
 
 	return grid, folds

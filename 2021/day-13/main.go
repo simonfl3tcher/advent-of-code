@@ -23,8 +23,8 @@ type GridElement struct {
 }
 
 type Fold struct {
-	axis       string
-	lineNumber int
+	axis   string
+	number int
 }
 
 func GridAndFoldsFromLines(lines []string) ([][]string, []Fold) {
@@ -54,7 +54,7 @@ func GridAndFoldsFromLines(lines []string) ([][]string, []Fold) {
 		} else {
 			matches := foldRegex.FindStringSubmatch(line)
 			i, _ := strconv.Atoi(matches[2])
-			fold := Fold{axis: matches[1], lineNumber: i}
+			fold := Fold{axis: matches[1], number: i}
 			folds = append(folds, fold)
 		}
 	}
@@ -82,31 +82,31 @@ func runFolds(grid *[][]string, folds []Fold) {
 		if fold.axis == "x" {
 			for gridI, gy := range *grid {
 				iteration := 1
-				for i := fold.lineNumber + 1; i < len(gy); i++ {
-					if (*grid)[gridI][i] == "#" || (*grid)[gridI][fold.lineNumber-iteration] == "#" {
-						(*grid)[gridI][fold.lineNumber-iteration] = "#"
+				for i := fold.number + 1; i < len(gy); i++ {
+					if (*grid)[gridI][i] == "#" || (*grid)[gridI][fold.number-iteration] == "#" {
+						(*grid)[gridI][fold.number-iteration] = "#"
 					}
 					iteration++
 				}
-				(*grid)[gridI] = (*grid)[gridI][:fold.lineNumber]
+				(*grid)[gridI] = (*grid)[gridI][:fold.number]
 			}
 		} else if fold.axis == "y" {
 			iteration := 1
-			for i := fold.lineNumber + 1; i < len(*grid); i++ {
+			for i := fold.number + 1; i < len(*grid); i++ {
 				for charI, char := range (*grid)[i] {
-					if char == "#" || (*grid)[fold.lineNumber-iteration][charI] == "#" {
-						(*grid)[fold.lineNumber-iteration][charI] = "#"
+					if char == "#" || (*grid)[fold.number-iteration][charI] == "#" {
+						(*grid)[fold.number-iteration][charI] = "#"
 					}
 				}
 				iteration++
 			}
 
-			*grid = (*grid)[:fold.lineNumber]
+			*grid = (*grid)[:fold.number]
 		}
 	}
 }
 
-func part1(lines []string) int {
+func part1(lines []string) {
 	grid, folds := GridAndFoldsFromLines(lines)
 	runFolds(&grid, []Fold{folds[0]})
 
@@ -118,8 +118,7 @@ func part1(lines []string) int {
 			}
 		}
 	}
-
-	return acc
+	fmt.Printf("Part 1: %d\n", acc)
 }
 
 func part2(lines []string) {
@@ -134,7 +133,6 @@ func part2(lines []string) {
 
 func main() {
 	lines := utils.FileLinesToSlice("input.txt")
-
-	fmt.Printf("Part 1: %d\n", part1(lines))
+	part1(lines)
 	part2(lines)
 }
